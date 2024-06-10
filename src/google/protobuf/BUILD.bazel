@@ -8,6 +8,7 @@ load("//bazel:cc_proto_library.bzl", "cc_proto_library")
 load("//bazel:proto_library.bzl", "proto_library")
 load("//build_defs:cpp_opts.bzl", "COPTS", "LINK_OPTS")
 load("//upb/cmake:build_defs.bzl", "staleness_test")
+load("@rules_buf//buf:defs.bzl", "buf_breaking_test")
 
 package(
     default_visibility = [
@@ -189,6 +190,16 @@ staleness_test(
         [wkt + ".pb.cc" for wkt in WELL_KNOWN_TYPES],
     generated_pattern = "wkt/google/protobuf/%s",
     tags = ["manual"],
+)
+
+buf_breaking_test(
+    name = "wkt_proto_breaking",
+    against = "image.bin",
+    config = ":buf.yaml",
+    error_format = "json",
+    targets = [
+        ":" + wkt + "_proto" for wkt in WELL_KNOWN_TYPES
+    ]
 )
 
 # This is necessary for our generated cmake configs to pick up the checked in
