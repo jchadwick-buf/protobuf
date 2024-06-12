@@ -4,11 +4,12 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
+load("@rules_buf//buf:defs.bzl", "buf_breaking_test")
 load("//bazel:cc_proto_library.bzl", "cc_proto_library")
 load("//bazel:proto_library.bzl", "proto_library")
 load("//build_defs:cpp_opts.bzl", "COPTS", "LINK_OPTS")
+load("//src/google/protobuf/breaking:breaking_image.bzl", "buf_breaking_image")
 load("//upb/cmake:build_defs.bzl", "staleness_test")
-load("@rules_buf//buf:defs.bzl", "buf_breaking_test")
 
 package(
     default_visibility = [
@@ -192,16 +193,6 @@ staleness_test(
     tags = ["manual"],
 )
 
-buf_breaking_test(
-    name = "wkt_proto_breaking",
-    against = "image.bin",
-    config = ":buf.yaml",
-    error_format = "json",
-    targets = [
-        ":" + wkt + "_proto" for wkt in WELL_KNOWN_TYPES
-    ]
-)
-
 # This is necessary for our generated cmake configs to pick up the checked in
 # WKT files.
 # TODO Remove this once we generate WKT code from cmake.
@@ -232,6 +223,26 @@ proto_library(
         "//:__pkg__",
         "//pkg:__pkg__",
     ],
+)
+
+buf_breaking_image(
+    name = "wkt_prevrel_image",
+    input = "@com_google_protobuf_prevrel//file",
+    input_opts = {
+        "format": "tar",
+        "compression": "gzip",
+        "strip_components": "1",
+        "subdir": "src",
+    },
+    paths = ["google/protobuf/" + wkt + ".proto" for wkt in WELL_KNOWN_TYPES],
+)
+
+buf_breaking_test(
+    name = "wkt_breaking",
+    against = ":wkt_prevrel_image",
+    config = ":buf.yaml",
+    error_format = "json",
+    targets = [wkt + "_proto" for wkt in WELL_KNOWN_TYPES],
 )
 
 proto_library(

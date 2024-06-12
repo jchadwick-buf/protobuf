@@ -9,7 +9,7 @@ local_repository(name = "com_google_protobuf", path = ".")
 # buildifier: disable=duplicated-name
 local_repository(name = "protobuf", path = ".")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 local_repository(
     name = "com_google_protobuf_examples",
@@ -242,8 +242,6 @@ http_archive(
     url = "https://github.com/protocolbuffers/utf8_range/archive/d863bc33e15cba6d873c878dcca9e6fe52b2f8cb.zip",
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 http_archive(
     name = "rules_buf",
     integrity = "sha256-Hr64Q/CaYr0E3ptAjEOgdZd1yc+cBjp7OG1wzuf3DIs=",
@@ -258,3 +256,10 @@ load("@rules_buf//buf:repositories.bzl", "rules_buf_dependencies", "rules_buf_to
 rules_buf_dependencies()
 
 rules_buf_toolchains(version = "v1.32.1")
+
+# For checking breaking changes to well-known types from the previous release version.
+load("//:protobuf_version.bzl", "PROTOBUF_PREVIOUS_RELEASE")
+http_file(
+    name = "com_google_protobuf_prevrel",
+    url = "https://github.com/protocolbuffers/protobuf/releases/download/v" + PROTOBUF_PREVIOUS_RELEASE + "/protobuf-" + PROTOBUF_PREVIOUS_RELEASE + ".tar.gz",
+)
