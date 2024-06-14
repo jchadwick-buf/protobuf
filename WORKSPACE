@@ -241,3 +241,19 @@ http_archive(
     strip_prefix = "utf8_range-d863bc33e15cba6d873c878dcca9e6fe52b2f8cb",
     url = "https://github.com/protocolbuffers/utf8_range/archive/d863bc33e15cba6d873c878dcca9e6fe52b2f8cb.zip",
 )
+
+# For checking breaking changes to well-known types from the previous release version.
+load("//:protobuf_version.bzl", "PROTOBUF_PREVIOUS_RELEASE")
+
+http_archive(
+    name = "com_google_protobuf_v" + PROTOBUF_PREVIOUS_RELEASE,
+    strip_prefix = "protobuf-" + PROTOBUF_PREVIOUS_RELEASE,
+    url = "https://github.com/protocolbuffers/protobuf/releases/download/v{0}/protobuf-{0}.tar.gz".format(PROTOBUF_PREVIOUS_RELEASE),
+)
+
+load("//compatibility/breaking:toolchain.bzl", "breaking_toolchain")
+
+breaking_toolchain(
+    version = "v1.33.0",
+    sha256 = "de0270213ebaf506fb0ed54e0a8d2013a4dbdaba0a0ea2ebc195a0c9844a3f3a",
+)

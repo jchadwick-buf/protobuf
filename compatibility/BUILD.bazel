@@ -1,10 +1,12 @@
+load("//compatibility:runtime_conformance.bzl", "java_runtime_conformance")
+load("//compatibility/breaking:test.bzl", "proto_breaking_test")
+load("//:protobuf_version.bzl", "PROTOBUF_PREVIOUS_RELEASE")
+
 # Simple build tests for compatibility of gencode from previous major versions
 # with the current runtime.
 #
 # To add more test cases in Java, use java_runtime_conformance as below, and add
 # the corresponding http_archive in the WORKSPACE file for the version.
-
-load("//compatibility:runtime_conformance.bzl", "java_runtime_conformance")
 
 # main gencode builds with main runtime as a proof of concept.
 java_runtime_conformance(
@@ -17,4 +19,24 @@ java_runtime_conformance(
     name = "java_conformance_v3.25.0",
     gencode_version = "3.25.0",
     tags = ["manual"],
+)
+
+# Breaking change detection for well-known types and descriptor.proto.
+proto_breaking_test(
+    name = "wkt_breaking_previous_release",
+    targets = [
+        "any_proto",
+        "api_proto",
+        "descriptor_proto",
+        "duration_proto",
+        "empty_proto",
+        "field_mask_proto",
+        "source_context_proto",
+        "struct_proto",
+        "timestamp_proto",
+        "type_proto",
+        "wrappers_proto",
+    ],
+    against_version = PROTOBUF_PREVIOUS_RELEASE,
+    config = ":buf.yaml",
 )
