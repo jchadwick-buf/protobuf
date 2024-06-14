@@ -241,3 +241,27 @@ http_archive(
     strip_prefix = "utf8_range-d863bc33e15cba6d873c878dcca9e6fe52b2f8cb",
     url = "https://github.com/protocolbuffers/utf8_range/archive/d863bc33e15cba6d873c878dcca9e6fe52b2f8cb.zip",
 )
+
+# For checking breaking changes to well-known types from the previous release version.
+load("//:protobuf_version.bzl", "PROTOBUF_PREVIOUS_RELEASE")
+
+http_archive(
+    name = "com_google_protobuf_previous_release",
+    strip_prefix = "protobuf-" + PROTOBUF_PREVIOUS_RELEASE,
+    url = "https://github.com/protocolbuffers/protobuf/releases/download/v{0}/protobuf-{0}.tar.gz".format(PROTOBUF_PREVIOUS_RELEASE),
+)
+
+http_archive(
+    name = "rules_buf",
+    integrity = "sha256-Hr64Q/CaYr0E3ptAjEOgdZd1yc+cBjp7OG1wzuf3DIs=",
+    strip_prefix = "rules_buf-0.3.0",
+    urls = [
+        "https://github.com/bufbuild/rules_buf/archive/refs/tags/v0.3.0.zip",
+    ],
+)
+
+load("@rules_buf//buf:repositories.bzl", "rules_buf_dependencies", "rules_buf_toolchains")
+
+rules_buf_dependencies()
+
+rules_buf_toolchains(version = "v1.32.1")
